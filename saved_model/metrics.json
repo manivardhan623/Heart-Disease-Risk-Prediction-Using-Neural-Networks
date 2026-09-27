@@ -1,0 +1,1 @@
+{"test_accuracy": 100.0, "test_loss": 0.0019, "train_samples": 820, "test_samples": 205, "features_used": ["age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal"], "epochs_trained": 50}

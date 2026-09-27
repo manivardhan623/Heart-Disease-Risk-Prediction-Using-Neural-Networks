@@ -1,0 +1,519 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Heart Disease Prediction System{% endblock %}
+
+{% block body %}
+<div class="app-layout">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="brand-icon-sm">
+          <svg viewBox="0 0 48 48" fill="none"><path d="M24 42s-18-10.5-18-22.5A10.5 10.5 0 0 1 24 10.5 10.5 10.5 0 0 1 42 19.5C42 31.5 24 42 24 42z" fill="url(#hg3)"/><defs><linearGradient id="hg3" x1="6" y1="10" x2="42" y2="42" gradientUnits="userSpaceOnUse"><stop stop-color="#f43f5e"/><stop offset="1" stop-color="#e11d48"/></linearGradient></defs></svg>
+        </div>
+        <div>
+          <span class="sidebar-title">HeartAI</span>
+          <span class="sidebar-sub">Prediction System</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Navigation</div>
+      <a href="#overview-section" class="nav-link active" data-section="overview-section" onclick="scrollToSection(event, 'overview-section')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/></svg>
+        Overview
+      </a>
+      <a href="#predict-section" class="nav-link" data-section="predict-section" onclick="scrollToSection(event, 'predict-section')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
+        Predict
+      </a>
+      <a href="#charts-section" class="nav-link" data-section="charts-section" onclick="scrollToSection(event, 'charts-section')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+        Analytics
+      </a>
+      <a href="#info-section" class="nav-link" data-section="info-section" onclick="scrollToSection(event, 'info-section')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+        About
+      </a>
+
+      <div class="nav-section-label" style="margin-top: 1.5rem;">Dataset &amp; Model</div>
+      <a href="#train-section" class="nav-link" data-section="train-section" onclick="scrollToSection(event, 'train-section')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+        Train Model
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">{{ user.username[0].upper() }}</div>
+        <div class="user-details">
+          <span class="user-name">{{ user.username }}</span>
+          <span class="user-email">{{ user.email[:20] ~ ('…' if user.email|length > 20 else '') }}</span>
+        </div>
+      </div>
+      <a href="{{ url_for('logout') }}" class="btn-logout" id="logoutBtn">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h7a1 1 0 100-2H4V5h6a1 1 0 100-2H3zm10.293 4.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L14.586 11H9a1 1 0 110-2h5.586l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- ═══ MOBILE TOP BAR ═══ -->
+  <div class="mobile-bar">
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </button>
+    <span class="mobile-title">HeartAI</span>
+    <a href="{{ url_for('logout') }}" class="mobile-logout">⎋</a>
+  </div>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <main class="main-content">
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container" id="flashContainer">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} flash-toast">
+              <span class="alert-icon">{% if category == 'success' %}✓{% elif category == 'error' %}✗{% elif category == 'warning' %}⚠{% else %}ℹ{% endif %}</span>
+              {{ message }}
+              <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- ───── OVERVIEW SECTION ───── -->
+    <section id="overview-section" class="content-section">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Heart Disease Prediction System</h1>
+          <p class="section-subtitle">AI-powered cardiovascular risk analysis using a 1D Convolutional Neural Network</p>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card {% if model_ok %}stat-success{% else %}stat-neutral{% endif %}">
+          <div class="stat-icon">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Model Status</span>
+            <span class="stat-value">{% if model_ok %}Trained ✓{% else %}Not Trained{% endif %}</span>
+          </div>
+        </div>
+
+        <div class="stat-card {% if dataset_ok %}stat-success{% else %}stat-warning{% endif %}">
+          <div class="stat-icon">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z"/><path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z"/><path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Dataset</span>
+            <span class="stat-value">{% if dataset_ok %}heart.csv ✓{% else %}Missing{% endif %}</span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-info-card">
+          <div class="stat-icon">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Test Accuracy</span>
+            <span class="stat-value">{% if metrics %}{{ metrics.test_accuracy }}%{% else %}—{% endif %}</span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-purple">
+          <div class="stat-icon">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM14 11a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z"/></svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Features</span>
+            <span class="stat-value">13 Clinical</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── TRAIN SECTION ───── -->
+    <section id="train-section" class="content-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title-sm">Dataset &amp; Model Training</h2>
+          <p class="section-subtitle">Upload your dataset or train the CNN model</p>
+        </div>
+      </div>
+
+      <div class="two-col-grid">
+        <!-- Upload Dataset -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+              Upload Dataset
+            </h3>
+          </div>
+          <div class="card-body">
+            {% if not dataset_ok %}
+              <div class="info-banner info-warning">
+                <strong>⚠ Dataset Not Found</strong><br/>
+                Please upload <code>heart.csv</code> (UCI Heart Disease dataset from Kaggle).
+              </div>
+            {% else %}
+              <div class="info-banner info-success">
+                <strong>✓ Dataset Ready</strong><br/>
+                <code>heart.csv</code> is loaded and ready for training.
+              </div>
+            {% endif %}
+            <form method="POST" action="{{ url_for('upload_dataset') }}" enctype="multipart/form-data" id="uploadForm">
+              <div class="file-drop-zone" id="dropZone">
+                <div class="drop-icon">📂</div>
+                <p>Drag &amp; drop <code>heart.csv</code> here or</p>
+                <label for="dataset_file" class="btn-secondary" style="cursor:pointer;">Browse File</label>
+                <input type="file" id="dataset_file" name="dataset_file" accept=".csv" style="display:none" onchange="triggerUpload(this)"/>
+                <p class="drop-hint" id="selectedFileName">No file chosen</p>
+              </div>
+              <button type="submit" class="btn-primary btn-full" style="margin-top:1rem;">Upload Dataset</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Train Model -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+              Train CNN Model
+            </h3>
+          </div>
+          <div class="card-body">
+            <div class="model-architecture">
+              <p class="arch-label">Model Architecture</p>
+              <div class="arch-layers">
+                <div class="arch-layer layer-conv">Conv1D × 3 (ReLU)</div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-layer layer-pool">MaxPooling1D</div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-layer layer-flat">Flatten + Dropout</div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-layer layer-dense">Dense × 2 (ReLU)</div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-layer layer-out">Output (Sigmoid)</div>
+              </div>
+            </div>
+            <div class="train-params">
+              <div class="param-row"><span>Optimizer</span><span>Adam</span></div>
+              <div class="param-row"><span>Loss</span><span>Binary Crossentropy</span></div>
+              <div class="param-row"><span>Max Epochs</span><span>50</span></div>
+              <div class="param-row"><span>Batch Size</span><span>16</span></div>
+              <div class="param-row"><span>Split</span><span>80% / 20%</span></div>
+            </div>
+            {% if model_ok %}
+              <div class="info-banner info-success" style="margin-bottom:1rem;">
+                ✓ Model already trained — accuracy: <strong>{{ metrics.test_accuracy }}%</strong>
+              </div>
+            {% endif %}
+            <form method="POST" action="{{ url_for('train') }}" id="trainForm">
+              <button type="submit" class="btn-primary btn-full {% if not dataset_ok %}btn-disabled{% endif %}"
+                      id="trainBtn" {% if not dataset_ok %}disabled{% endif %}
+                      onclick="startTraining(event, this)">
+                <span class="btn-text">{% if model_ok %}Retrain Model{% else %}Train Model{% endif %}</span>
+                <span class="btn-loader hidden">
+                  <svg class="spin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="32" stroke-dashoffset="12"/></svg>
+                  Training…
+                </span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── PREDICT SECTION ───── -->
+    <section id="predict-section" class="content-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title-sm">Heart Disease Prediction</h2>
+          <p class="section-subtitle">Enter patient clinical parameters for instant AI risk assessment</p>
+        </div>
+      </div>
+
+      {% if not model_ok %}
+        <div class="info-banner info-warning">
+          ⚠ Model not trained yet. Please upload <code>heart.csv</code> and train the model first.
+        </div>
+      {% endif %}
+
+      <div class="card">
+        <div class="card-body">
+          <form id="predictForm" onsubmit="makePrediction(event)">
+            <div class="predict-grid">
+
+              <div class="form-group">
+                <label for="age">Age <span class="field-range">(20–90)</span></label>
+                <input type="number" id="age" name="age" placeholder="e.g. 52" min="1" max="120" required />
+              </div>
+
+              <div class="form-group">
+                <label for="sex">Sex</label>
+                <select id="sex" name="sex" required>
+                  <option value="" disabled selected>Select sex</option>
+                  <option value="1">Male (1)</option>
+                  <option value="0">Female (0)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="cp">Chest Pain Type (cp) <span class="field-range">(0–3)</span></label>
+                <select id="cp" name="cp" required>
+                  <option value="" disabled selected>Select type</option>
+                  <option value="0">0 – Typical Angina</option>
+                  <option value="1">1 – Atypical Angina</option>
+                  <option value="2">2 – Non-Anginal Pain</option>
+                  <option value="3">3 – Asymptomatic</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="trestbps">Resting Blood Pressure <span class="field-range">(mmHg)</span></label>
+                <input type="number" id="trestbps" name="trestbps" placeholder="e.g. 130" min="50" max="250" required />
+              </div>
+
+              <div class="form-group">
+                <label for="chol">Cholesterol <span class="field-range">(mg/dl)</span></label>
+                <input type="number" id="chol" name="chol" placeholder="e.g. 240" min="100" max="600" required />
+              </div>
+
+              <div class="form-group">
+                <label for="fbs">Fasting Blood Sugar &gt; 120 mg/dl</label>
+                <select id="fbs" name="fbs" required>
+                  <option value="" disabled selected>Select</option>
+                  <option value="1">Yes (1)</option>
+                  <option value="0">No (0)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="restecg">Resting ECG (restecg) <span class="field-range">(0–2)</span></label>
+                <select id="restecg" name="restecg" required>
+                  <option value="" disabled selected>Select result</option>
+                  <option value="0">0 – Normal</option>
+                  <option value="1">1 – ST-T Wave Abnormality</option>
+                  <option value="2">2 – Left Ventricular Hypertrophy</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="thalach">Max Heart Rate <span class="field-range">(thalach)</span></label>
+                <input type="number" id="thalach" name="thalach" placeholder="e.g. 150" min="60" max="250" required />
+              </div>
+
+              <div class="form-group">
+                <label for="exang">Exercise Induced Angina</label>
+                <select id="exang" name="exang" required>
+                  <option value="" disabled selected>Select</option>
+                  <option value="1">Yes (1)</option>
+                  <option value="0">No (0)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="oldpeak">ST Depression (Oldpeak) <span class="field-range">(0–6)</span></label>
+                <input type="number" id="oldpeak" name="oldpeak" placeholder="e.g. 2.3" min="0" max="10" step="0.1" required />
+              </div>
+
+              <div class="form-group">
+                <label for="slope">Slope of ST Segment <span class="field-range">(0–2)</span></label>
+                <select id="slope" name="slope" required>
+                  <option value="" disabled selected>Select slope</option>
+                  <option value="0">0 – Upsloping</option>
+                  <option value="1">1 – Flat</option>
+                  <option value="2">2 – Downsloping</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="ca">Number of Major Vessels (CA) <span class="field-range">(0–4)</span></label>
+                <select id="ca" name="ca" required>
+                  <option value="" disabled selected>Select count</option>
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="thal">Thalassemia (thal)</label>
+                <select id="thal" name="thal" required>
+                  <option value="" disabled selected>Select type</option>
+                  <option value="0">0 – Normal</option>
+                  <option value="1">1 – Fixed Defect</option>
+                  <option value="2">2 – Reversible Defect</option>
+                  <option value="3">3 – Unknown</option>
+                </select>
+              </div>
+
+            </div>
+
+            <div class="predict-actions">
+              <button type="submit" class="btn-primary btn-predict" id="predictBtn" {% if not model_ok %}disabled{% endif %}>
+                <svg viewBox="0 0 20 20" fill="currentColor" style="width:18px;height:18px;"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
+                Predict Now
+              </button>
+              <button type="button" class="btn-secondary btn-reset" onclick="resetForm()">
+                <svg viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg>
+                Reset
+              </button>
+            </div>
+          </form>
+
+          <!-- Prediction Result -->
+          <div id="predictionResult" class="prediction-result hidden">
+            <div class="result-content">
+              <div class="result-icon" id="resultIcon"></div>
+              <div class="result-text">
+                <h3 id="resultLabel"></h3>
+                <p id="resultProbability"></p>
+              </div>
+            </div>
+            <div class="probability-bar-wrapper">
+              <div class="probability-bar-bg">
+                <div class="probability-bar-fill" id="probBarFill"></div>
+              </div>
+              <div class="prob-labels">
+                <span>No Disease</span>
+                <span>High Risk</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── CHARTS SECTION ───── -->
+    <section id="charts-section" class="content-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title-sm">Training Analytics</h2>
+          <p class="section-subtitle">Model performance visualized over training epochs</p>
+        </div>
+      </div>
+
+      {% if model_ok and history %}
+        <div class="two-col-grid">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Accuracy over Epochs</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="accuracyChart" height="220"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Loss over Epochs</h3>
+            </div>
+            <div class="card-body">
+              <canvas id="lossChart" height="220"></canvas>
+            </div>
+          </div>
+        </div>
+
+        {% if metrics %}
+        <div class="metrics-row">
+          <div class="metric-badge">
+            <span class="metric-badge-label">Test Accuracy</span>
+            <span class="metric-badge-value accent-green">{{ metrics.test_accuracy }}%</span>
+          </div>
+          <div class="metric-badge">
+            <span class="metric-badge-label">Test Loss</span>
+            <span class="metric-badge-value accent-red">{{ metrics.test_loss }}</span>
+          </div>
+          <div class="metric-badge">
+            <span class="metric-badge-label">Training Samples</span>
+            <span class="metric-badge-value accent-blue">{{ metrics.train_samples }}</span>
+          </div>
+          <div class="metric-badge">
+            <span class="metric-badge-label">Test Samples</span>
+            <span class="metric-badge-value accent-purple">{{ metrics.test_samples }}</span>
+          </div>
+          <div class="metric-badge">
+            <span class="metric-badge-label">Epochs Trained</span>
+            <span class="metric-badge-value accent-orange">{{ metrics.epochs_trained }}</span>
+          </div>
+        </div>
+        {% endif %}
+
+      {% else %}
+        <div class="info-banner info-neutral" style="text-align:center; padding: 3rem 2rem;">
+          <div style="font-size: 2.5rem; margin-bottom: 1rem;">📊</div>
+          <strong>No training data yet.</strong><br/>
+          Train the model to see accuracy and loss charts here.
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- ───── INFO SECTION ───── -->
+    <section id="info-section" class="content-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title-sm">About Heart Disease</h2>
+          <p class="section-subtitle">Key facts and risk factors you should know</p>
+        </div>
+      </div>
+
+      <div class="info-cards-grid">
+        <div class="info-card info-card-red">
+          <div class="info-card-icon">❤️</div>
+          <h4>What is Heart Disease?</h4>
+          <p>Heart disease refers to conditions affecting the heart's structure and function, including coronary artery disease, arrhythmias, and heart defects. It is the leading cause of death globally.</p>
+        </div>
+        <div class="info-card info-card-orange">
+          <div class="info-card-icon">⚠️</div>
+          <h4>Risk Factors</h4>
+          <p>High blood pressure, high cholesterol, smoking, diabetes, obesity, physical inactivity, and family history are primary risk factors. Early detection is critical for prevention.</p>
+        </div>
+        <div class="info-card info-card-blue">
+          <div class="info-card-icon">🤖</div>
+          <h4>CNN-based Diagnosis</h4>
+          <p>Our 1D CNN treats 13 clinical features as a 1D sequence, enabling deep feature extraction via convolutional filters — achieving high accuracy comparable to medical baselines.</p>
+        </div>
+        <div class="info-card info-card-green">
+          <div class="info-card-icon">🏥</div>
+          <h4>Dataset Source</h4>
+          <p>We use the UCI Heart Disease dataset (available on Kaggle). It contains 303 patient records with 13 clinical attributes and a binary target (0=No Disease, 1=Disease).</p>
+        </div>
+        <div class="info-card info-card-purple">
+          <div class="info-card-icon">⚕️</div>
+          <h4>Disclaimer</h4>
+          <p>This tool is for educational and research purposes only. It is <strong>not</strong> a medical device and should not replace professional medical advice. Always consult a qualified physician.</p>
+        </div>
+        <div class="info-card info-card-teal">
+          <div class="info-card-icon">📋</div>
+          <h4>Clinical Parameters</h4>
+          <p>The model uses: Age, Sex, Chest Pain Type, Blood Pressure, Cholesterol, Blood Sugar, ECG, Max Heart Rate, Exercise Angina, ST Depression, Slope, Vessels, and Thalassemia.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Overlay for mobile sidebar -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Pass training history to JS
+  const HISTORY_DATA = {{ history | tojson | safe }};
+  initCharts(HISTORY_DATA);
+</script>
+{% endblock %}
